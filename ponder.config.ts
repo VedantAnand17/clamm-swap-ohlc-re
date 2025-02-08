@@ -1,21 +1,21 @@
 import { createConfig } from "ponder";
 import { http } from "viem";
-
-import { ExampleContractAbi } from "./abis/ExampleContractAbi";
+import { UniswapV3PoolABI } from "./abis/UniswapV3PoolABI";
 
 export default createConfig({
   networks: {
-    mainnet: {
-      chainId: 1,
-      transport: http(process.env.PONDER_RPC_URL_1),
+    arbitrum: {
+      chainId: 42161,
+      transport: http(process.env.PONDER_RPC_URL_42161),
     },
   },
   contracts: {
-    ExampleContract: {
-      network: "mainnet",
-      abi: ExampleContractAbi,
-      address: "0x0000000000000000000000000000000000000000",
-      startBlock: 1234567,
+    UniswapV3Pool: {
+      network: "arbitrum",
+      address: ["0xC6962004f452bE9203591991D15f6b388e09E8D0"],
+      startBlock: 188249317,
+      endBlock: 189999317,
+      abi: UniswapV3PoolABI,
     },
   },
 });
