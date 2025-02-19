@@ -1,14 +1,13 @@
 import { ponder } from "ponder:registry";
 import { dayBuckets, fifteenMinuteBuckets, fiveMinuteBuckets, fourHourBuckets, hourBuckets, oneMinuteBuckets } from "../ponder.schema";
+import { getActualPrice } from "./hooks/getActualPrice";
 
 const secondsInHour = 60 * 60;
  
 ponder.on("UniswapV3Pool:Swap", async ({ event, context }) => {
   const { timestamp } = event.block;
-  const { sqrtPriceX96 } = event.args;
-  const price = Number(
-    (BigInt(sqrtPriceX96) * BigInt(sqrtPriceX96) * BigInt(1e36)) / (2n ** 192n)
-  ) / 1e36;
+  
+  const price = getActualPrice(event.log.address.toLowerCase(), BigInt(event.args.sqrtPriceX96));
 
   const secondsInMinute = 60;
   const secondsInFiveMinutes = 5 * 60;
