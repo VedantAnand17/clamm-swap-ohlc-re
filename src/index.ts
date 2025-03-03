@@ -1,13 +1,23 @@
 import { ponder } from "ponder:registry";
-import { dayBuckets, fifteenMinuteBuckets, fiveMinuteBuckets, fourHourBuckets, hourBuckets, oneMinuteBuckets } from "../ponder.schema";
+import {
+  dayBuckets,
+  fifteenMinuteBuckets,
+  fiveMinuteBuckets,
+  fourHourBuckets,
+  hourBuckets,
+  oneMinuteBuckets,
+} from "../ponder.schema";
 import { getActualPrice } from "./hooks/getActualPrice";
 
 const secondsInHour = 60 * 60;
- 
+
 ponder.on("UniswapV3Pool:Swap", async ({ event, context }) => {
   const { timestamp } = event.block;
-  
-  const price = getActualPrice(event.log.address.toLowerCase(), BigInt(event.args.sqrtPriceX96));
+
+  const price = getActualPrice(
+    event.log.address.toLowerCase(),
+    BigInt(event.args.sqrtPriceX96)
+  );
 
   const secondsInMinute = 60;
   const secondsInFiveMinutes = 5 * 60;
@@ -16,11 +26,16 @@ ponder.on("UniswapV3Pool:Swap", async ({ event, context }) => {
   const secondsInFourHours = 4 * 60 * 60;
   const secondsInDay = 24 * 60 * 60;
 
-  const minuteId = Math.floor(Number(timestamp) / secondsInMinute) * secondsInMinute;
-  const fiveMinuteId = Math.floor(Number(timestamp) / secondsInFiveMinutes) * secondsInFiveMinutes;
-  const fifteenMinuteId = Math.floor(Number(timestamp) / secondsInFifteenMinutes) * secondsInFifteenMinutes;
+  const minuteId =
+    Math.floor(Number(timestamp) / secondsInMinute) * secondsInMinute;
+  const fiveMinuteId =
+    Math.floor(Number(timestamp) / secondsInFiveMinutes) * secondsInFiveMinutes;
+  const fifteenMinuteId =
+    Math.floor(Number(timestamp) / secondsInFifteenMinutes) *
+    secondsInFifteenMinutes;
   const hourId = Math.floor(Number(timestamp) / secondsInHour) * secondsInHour;
-  const fourHourId = Math.floor(Number(timestamp) / secondsInFourHours) * secondsInFourHours;
+  const fourHourId =
+    Math.floor(Number(timestamp) / secondsInFourHours) * secondsInFourHours;
   const dayId = Math.floor(Number(timestamp) / secondsInDay) * secondsInDay;
 
   const bucketData = {
@@ -33,6 +48,7 @@ ponder.on("UniswapV3Pool:Swap", async ({ event, context }) => {
   };
 
   const updateData = (row: any) => ({
+    open: row.open,
     close: price,
     low: Math.min(row.low, price),
     high: Math.max(row.high, price),

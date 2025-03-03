@@ -16,15 +16,15 @@ export function getActualPrice(poolAddress: string, sqrtPriceX96: bigint): numbe
 
   // Create token instances
   const token0 = new Token(
-    42161, // Arbitrum chain ID
-    poolAddress, // Using pool address as token address for now
+    poolConfig.chainId, // Arbitrum chain ID
+    poolConfig.token0.address, // Using pool address as token address for now
     poolConfig.token0.decimals,
     poolConfig.token0.symbol
   );
 
   const token1 = new Token(
-    42161,
-    poolAddress,
+    poolConfig.chainId,
+    poolConfig.token1.address,
     poolConfig.token1.decimals,
     poolConfig.token1.symbol
   );
