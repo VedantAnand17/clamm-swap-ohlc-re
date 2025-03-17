@@ -2,7 +2,14 @@ import { Hono } from "hono";
 import { client, graphql } from "ponder";
 import { db } from "ponder:api";
 import schema from "ponder:schema";
-import { oneMinuteBuckets } from "../../ponder.schema";
+import {
+  oneMinuteBuckets,
+  fiveMinuteBuckets,
+  fifteenMinuteBuckets,
+  hourBuckets,
+  fourHourBuckets,
+  dayBuckets,
+} from "../../ponder.schema";
 import { sql } from "ponder";
 
 // Create a new Hono app
@@ -404,6 +411,117 @@ app.get("/prices/all", async (c) => {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";
     return c.json({ error: errorMessage }, 500);
+  }
+});
+
+/**
+ * Gets OHLC data for a specific pool and time interval
+ * @param pool The address of the Uniswap V3 pool
+ * @param interval The time interval for the OHLC data (1m, 5m, 15m, 1h, 4h, 1d)
+ * @param from The start timestamp (Unix timestamp in seconds)
+ * @param to The end timestamp (Unix timestamp in seconds)
+ * @param limit Maximum number of data points to return
+ * @returns Array of OHLC data points
+ */
+async function getOHLCData(
+  pool: string,
+  interval: string,
+  from?: number,
+  to?: number,
+  limit?: number
+): Promise<Array<[number, number, number, number, number, number]>> {
+  const normalizedPoolAddress = pool.toLowerCase();
+
+  // Select the appropriate table based on the interval
+  let table;
+  switch (interval) {
+    case "1m":
+      table = oneMinuteBuckets;
+      break;
+    case "5m":
+      table = fiveMinuteBuckets;
+      break;
+    case "15m":
+      table = fifteenMinuteBuckets;
+      break;
+    case "1h":
+      table = hourBuckets;
+      break;
+    case "4h":
+      table = fourHourBuckets;
+      break;
+    case "1d":
+      table = dayBuckets;
+      break;
+    default:
+      throw new Error(
+        `Invalid interval: ${interval}. Supported intervals are 1m, 5m, 15m, 1h, 4h, 1d`
+      );
+  }
+
+  // Build the query
+  let query = db
+    .select()
+    .from(table)
+    .where(sql`${table.pool} = ${normalizedPoolAddress}`);
+
+  // Add time range filters if provided
+  if (from !== undefined) {
+    query = query.where(sql`${table.id} >= ${from}`);
+  }
+
+  if (to !== undefined) {
+    query = query.where(sql`${table.id} <= ${to}`);
+  }
+
+  // Order by timestamp (ascending)
+  query = query.orderBy(sql`${table.id} ASC`);
+
+  // Apply limit if provided
+  if (limit !== undefined && limit > 0) {
+    query = query.limit(limit);
+  }
+
+  // Execute the query
+  const results = await query;
+
+  // Format the results as arrays: [timestamp, open, high, low, close, average]
+  return results.map((bucket) => [
+    bucket.id,
+    Number(bucket.open),
+    Number(bucket.high),
+    Number(bucket.low),
+    Number(bucket.close),
+    Number(bucket.average),
+  ]);
+}
+
+// Endpoint to get OHLC data
+app.get("/ohlc/:pool", async (c) => {
+  try {
+    const pool = c.req.param("pool");
+    const interval = c.req.query("interval") || "1h";
+    const from = c.req.query("from")
+      ? parseInt(c.req.query("from") || "")
+      : undefined;
+    const to = c.req.query("to")
+      ? parseInt(c.req.query("to") || "")
+      : undefined;
+    const limit = c.req.query("limit")
+      ? parseInt(c.req.query("limit") || "")
+      : undefined;
+
+    const ohlcData = await getOHLCData(pool, interval, from, to, limit);
+
+    return c.json({
+      pool,
+      interval,
+      data: ohlcData,
+    });
+  } catch (error: unknown) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    return c.json({ error: errorMessage }, 400);
   }
 });
 
