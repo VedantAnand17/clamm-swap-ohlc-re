@@ -1,4 +1,4 @@
-import { Price, Token } from '@uniswap/sdk-core';
+import { Price, Token } from "@uniswap/sdk-core";
 import { POOL_CONFIGS } from "../../poolConfig";
 
 /**
@@ -7,9 +7,12 @@ import { POOL_CONFIGS } from "../../poolConfig";
  * @param sqrtPriceX96 The sqrtPriceX96 value from the pool
  * @returns The price in USD terms
  */
-export function getActualPrice(poolAddress: string, sqrtPriceX96: bigint): number {
+export function getActualPrice(
+  poolAddress: string,
+  sqrtPriceX96: bigint
+): number {
   const poolConfig = POOL_CONFIGS[poolAddress.toLowerCase()];
-  
+
   if (!poolConfig) {
     throw new Error(`Pool config not found for address ${poolAddress}`);
   }
