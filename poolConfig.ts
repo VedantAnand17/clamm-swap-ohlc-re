@@ -15,17 +15,17 @@ export interface PoolConfig {
 }
 
 export const POOL_CONFIGS: Record<string, PoolConfig> = {
-  "0xd0b53d9277642d899df5c87a3966a349a798f224": {
-    address: "0xd0b53d9277642d899df5c87a3966a349a798f224",
-    chainId: 8453, // Arbitrum One
-    isToken1Volatile: false, // is WETH token1?
+  "0x60a336798063396d8f0f398411bad02a762735c4": {
+    address: "0x60a336798063396d8f0f398411bad02a762735c4",
+    chainId: 10143, // Monad
+    isToken1Volatile: false, // is WBTC token1?
     token0: {
-      address: "0x4200000000000000000000000000000000000006", // WETH on Arbitrum
-      decimals: 18,
-      symbol: "WETH",
+      address: "0xcf5a6076cfa32686c0df13abada2b40dec133f1d", // WBTC on Monad
+      decimals: 8,
+      symbol: "WBTC",
     },
     token1: {
-      address: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913", // USDC on Arbitrum
+      address: "0xf817257fed379853cde0fa4f97ab987181b1e5ea", // USDC on Arbitrum
       decimals: 6,
       symbol: "USDC",
     },

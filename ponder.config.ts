@@ -4,17 +4,17 @@ import { UniswapV3PoolABI } from "./abis/UniswapV3PoolABI";
 
 export default createConfig({
   networks: {
-    base: {
-      chainId: 8453,
-      transport: http(process.env.PONDER_RPC_URL_8453),
+    monad: {
+      chainId: 10143,
+      transport: http(process.env.PONDER_RPC_URL_10143),
       maxRequestsPerSecond: 300,
     },
   },
   contracts: {
     UniswapV3Pool: {
-      network: "base",
-      address: ["0xd0b53D9277642d899DF5C87A3966A349A798F224"],
-      startBlock: 21620977,
+      network: "monad",
+      address: ["0x60a336798063396d8f0f398411bad02a762735c4"],
+      startBlock: 26561045,
       abi: UniswapV3PoolABI,
     },
   },
