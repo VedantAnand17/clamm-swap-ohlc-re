@@ -70,20 +70,19 @@ ponder.on("UniswapV3Pool:Swap", async ({ event, context }) => {
     count: row.count + 1,
     volume: (row.volume || 0n) + volume,
   });
-  const pool_address = event.log.address;
 
   await Promise.all([
     context.db
       .insert(oneMinuteBuckets)
-      .values({ id: minuteId, pool: pool_address, ...bucketData })
+      .values({ id: minuteId, pool: poolAddress, ...bucketData })
       .onConflictDoUpdate(updateData),
     context.db
       .insert(hourBuckets)
-      .values({ id: hourId, pool: pool_address, ...bucketData })
+      .values({ id: hourId, pool: poolAddress, ...bucketData })
       .onConflictDoUpdate(updateData),
     context.db
       .insert(dayBuckets)
-      .values({ id: dayId, pool: pool_address, ...bucketData })
+      .values({ id: dayId, pool: poolAddress, ...bucketData })
       .onConflictDoUpdate(updateData),
   ]);
 });

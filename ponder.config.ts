@@ -13,8 +13,8 @@ export default createConfig({
   contracts: {
     UniswapV3Pool: {
       network: "monad",
-      address: ["0x60a336798063396d8f0f398411bad02a762735c4"],
-      startBlock: 26561045,
+      address: ["0xe8781Dc41A694c6877449CEFB27cc2C0Ae9D5dbc"],
+      startBlock: 30758249,
       abi: UniswapV3PoolABI,
     },
   },
